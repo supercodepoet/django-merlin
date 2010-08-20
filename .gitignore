@@ -1,0 +1,17 @@
+*.pyc
+*.egg-info
+
+.coverage
+.DS_Store
+.installed.cfg
+
+.idea/*
+
+bin
+build
+develop-eggs
+dist
+downloads
+eggs
+parts
+tmp
