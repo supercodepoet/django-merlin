@@ -58,6 +58,7 @@ class SessionWizard(object):
         Initialize the step list for the session if needed and call the proper
         HTTP method handler.
         """
+        print self.id
         self._init_wizard(request)
         slug = kwargs.get('slug', None)
         step = self.get_step(request, slug)
