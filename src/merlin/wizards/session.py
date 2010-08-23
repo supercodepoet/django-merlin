@@ -1,6 +1,8 @@
 from uuid import uuid4
 
 from django.http import *
+from django.shortcuts import render_to_response
+from django.template.context import RequestContext
 
 from merlin.wizards.utils import *
 
@@ -64,11 +66,14 @@ class SessionWizard(object):
 
     def _show_form(self, request, slug, form):
         context = self.process_show_form(request, slug, form)
-
         step = self._set_current_step(request, slug)
 
         return self.render_form(request, slug, form, {
-
+            'current_step': step,
+            'previous_step': None,
+            'next_step': None,
+            'url_base': self._get_URL_base(request, slug),
+            'extra_context': context
         })
 
     def _set_current_step(self, request, slug):
@@ -76,6 +81,15 @@ class SessionWizard(object):
         self._get_state(request).current_step = step
 
         return step
+
+    def _get_URL_base(self, request, slug):
+        path = request.path
+        index = request.path.find(slug)
+
+        if path.endswith('/'):
+            return path[:index]
+        else:
+            return path[:(index -1)]
 
     def process_GET(self, request, slug):
         form_data = self.get_cleaned_data(request, slug)
@@ -110,13 +124,29 @@ class SessionWizard(object):
     # METHODS SUBCLASSES MIGHT OVERRIDE IF APPROPRIATE #
     def process_show_form(self, request, slug, form):
         """
-        Called before rendering a form either from a GET or when a form submit
-        is invalid. This can be used to return extra context for the form
-        rendering.
+        Hook for providing extra context to the rendering of the form.
         """
 
     def get_template(self, request, slug, form):
-        pass
+        """
+        Hook for specifying the path of a template to use for rendering this
+        form.
+        """
+        return ''
 
     def render_form(self, request, slug, form, context):
-        pass
+        """
+        Hook for altering how the form is rendered to the response.
+        """
+        return render_to_response(self.get_template(request, slug, form),
+            context, RequestContext(request))
+
+    def done(self, request):
+        """
+        Hook for doing something with the validated data. This is responsible
+        for the final processing including clearing the session scope of items
+        created by this wizard.
+        """
+        raise NotImplementedError("Your %s class has not defined a done() " + \
+                                  "method, which is required." \
+                                  % self.__class__.__name__)
