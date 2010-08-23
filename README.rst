@@ -33,4 +33,4 @@ Credits
 -------
 
 This was mostly inspired by the SessionWizard snippet
-located `here<http://djangosnippets.org/snippets/1078/>`_
+located `here <http://djangosnippets.org/snippets/1078/>`_
