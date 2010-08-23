@@ -70,6 +70,7 @@ class SessionWizard(object):
 
         return self.render_form(request, slug, form, {
             'current_step': step,
+            'form': form,
             'previous_step': self.get_before(request, step),
             'next_step': self.get_after(request, step),
             'url_base': self._get_URL_base(request, slug),

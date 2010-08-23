@@ -6,7 +6,10 @@ from merlin.wizards.session import SessionWizard
 from merlin.tests.fixtures.testproject import forms
 
 urlpatterns = patterns('',
+    url(r'^simpletest$', SessionWizard([
+        Step('user-details', forms.UserDetailsForm),
+        Step('contact-details', forms.ContactDetailsForm)])),
     url(r'^simpletest/(?P<slug>[A-Za-z0-9_-]+)$', SessionWizard([
         Step('user-details', forms.UserDetailsForm),
-        Step('contact-details', forms.ContactDetailsForm)]), name="simpletest"),
+        Step('contact-details', forms.ContactDetailsForm)])),
 )
