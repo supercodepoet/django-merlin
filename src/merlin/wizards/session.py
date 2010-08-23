@@ -224,6 +224,6 @@ class SessionWizard(object):
         for the final processing including clearing the session scope of items
         created by this wizard.
         """
-        raise NotImplementedError("Your %s class has not defined a done() " + \
+        raise NotImplementedError("Your %s class has not defined a done() " \
                                   "method, which is required." \
                                   % self.__class__.__name__)
