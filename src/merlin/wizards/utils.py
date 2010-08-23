@@ -1,4 +1,9 @@
+from UserDict import UserDict
+
 from django import forms
+
+
+__all__ = ('Step', 'WizardState',)
 
 
 class Step(object):
@@ -29,3 +34,10 @@ class Step(object):
 
     def __repr__(self):
         return str(self)
+
+
+class WizardState(UserDict):
+    def __init__(self, *args, **kwargs):
+        self.steps = kwargs.get('steps', None)
+        self.current_step = kwargs.get('current_step', None)
+        self.form_data = kwargs.get('form_data', None)

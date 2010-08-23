@@ -1,17 +1,16 @@
-from collections import namedtuple
 from uuid import uuid4
 
 from django.http import *
 
-from merlin.wizards.utils import Step
-
-
-_WizardState = namedtuple('_WizardState', ('steps', 'current_step', 'data'))
+from merlin.wizards.utils import *
 
 
 class SessionWizard(object):
     # TODO: add class documentation
     def __init__(self, steps):
+        if not isinstance(steps, list):
+            raise TypeError('steps must be an instance of or subclass of list')
+
         if [step for step in steps if not isinstance(step, Step)]:
             raise TypeError('All steps must be an instance of Step')
 
@@ -55,12 +54,10 @@ class SessionWizard(object):
         way multiple connections will not trample on each others steps.
         """
         if self.id not in request.session:
-            wizard_state = _WizardState(
-                steps=self.base_steps[:],
+            request.session[self.id] = WizardState(
+                steps=self.base_steps[:], # Copies the list
                 current_step=self.base_steps[0],
-                data={})
-
-            request.session[self.id] = wizard_state
+                form_data={})
 
     def _get_state(self, request):
         return request.session[self.id]
