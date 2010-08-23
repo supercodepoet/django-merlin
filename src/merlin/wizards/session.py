@@ -1,3 +1,4 @@
+from urlparse import urljoin
 from uuid import uuid4
 
 from django.http import *
@@ -36,8 +37,7 @@ class SessionWizard(object):
         slug = kwargs.get('slug', None)
 
         if not slug:
-            steps = self.get_steps(request)
-            slug = steps[0].slug
+            raise Http404()
 
         try:
             method_name = 'process_%s' % request.method
@@ -101,7 +101,23 @@ class SessionWizard(object):
         return self._show_form(request, slug, form)
 
     def process_POST(self, request, slug):
-        pass
+        step = self.get_step(request, slug)
+        form = step.form(request.POST)
+
+        if form.is_valid():
+            self.set_cleaned_data(request, slug, form.cleaned_data)
+            self.process_step(request, slug, step, form)
+            next_step = self.get_after(request, step)
+
+            if next_step:
+                url_base = self._get_URL_base(request, slug)
+
+                return HttpResponseRedirect(urljoin(url_base, next_step.slug))
+
+            else:
+                return self.done(request)
+
+        return self._show_form(request, slug, form)
 
     def get_steps(self, request):
         return self._get_state(request).steps
@@ -119,10 +135,10 @@ class SessionWizard(object):
         steps = self.get_steps(request)
         index = steps.index(step)
 
-        try:
+        if index > 0:
             return steps[index - 1]
 
-        except IndexError:
+        else:
             return None
 
     def get_after(self, request, step):
@@ -138,11 +154,29 @@ class SessionWizard(object):
     def get_cleaned_data(self, request, slug):
         return self._get_state(request).form_data.get(slug, None)
 
+    def set_cleaned_data(self, request, slug, data):
+        self._get_state(request).form_data[slug] = data
+
     # METHODS SUBCLASSES MIGHT OVERRIDE IF APPROPRIATE #
     def process_show_form(self, request, slug, form):
         """
         Hook for providing extra context to the rendering of the form.
         """
+        pass
+
+    def process_step(self, request, slug, form, step):
+        """
+        Hook for modifying the StepWizard's internal state, given a fully
+        validated Form object. The Form is guaranteed to have clean, valid
+        data.
+
+        This method should *not* modify any of that data. Rather, it might want
+        dynamically alter self.form_list, based on previously submitted forms.
+
+        Note that this method is called every time a page is rendered for *all*
+        submitted steps through POST.
+        """
+        pass
 
     def get_template(self, request, slug, form):
         """
