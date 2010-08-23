@@ -58,12 +58,12 @@ class SessionWizard(object):
             wizard_state = _WizardState(
                 steps=self.base_steps[:],
                 current_step=self.base_steps[0],
-                form_data={})
+                data={})
 
             request.session[self.id] = wizard_state
 
     def _get_state(self, request):
-        return request.session.get[self.id]
+        return request.session[self.id]
 
     def _show_form(self, request, slug, form):
         context = self.process_show_form(request, slug, form)
