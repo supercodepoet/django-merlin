@@ -11,8 +11,8 @@ from merlin.wizards.utils import *
 
 def modifies_session(func):
     @wraps(func)
-    def wrapper(request, *args, **kwargs):
-        result = func(request, *args, **kwargs)
+    def wrapper(self, request, *args, **kwargs):
+        result = func(self, request, *args, **kwargs)
         request.session.modified = True
 
         return result
