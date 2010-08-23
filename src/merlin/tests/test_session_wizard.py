@@ -132,34 +132,29 @@ class MockWizardTest(TestCase):
             'email': 'cgallemore@gmail.com'
         }, follow=True)
 
-        self.assertEquals(post.status_code, 302)
-        redirect_location = post._headers["location"][1]
-        next_url = redirect_location.split('http://testserver')[1]
+        self.assertEquals(post.redirect_chain[0],
+            ('http://testserver/bettertest/few-more-things', 302))
+        self.assertEquals(post.status_code, 200)
 
-        few_more_things_form = self.client.get(next_url)
-        self.assertEquals(few_more_things_form.status_code, 200)
-
-        soup = BeautifulSoup(few_more_things_form.content)
+        soup = BeautifulSoup(post.content)
         self.assertTrue(soup.find('input', id="id_bio"))
 
-        post_few_more_things = self.client.post(next_url, {
+        post = self.client.post(post.request['PATH_INFO'], {
             'bio': 'My bio'
-        })
-        self.assertEquals(post_few_more_things.status_code, 302)
-        redirect_location = post_few_more_things._headers["location"][1]
-        next_url = redirect_location.split('http://testserver')[1]
+        }, follow=True)
 
-        social_form = self.client.get(next_url)
-        self.assertEquals(social_form.status_code, 200)
+        self.assertEquals(post.redirect_chain[0],
+            ('http://testserver/bettertest/social-info', 302))
+        self.assertEquals(post.status_code, 200)
 
-        soup = BeautifulSoup(social_form.content)
+        soup = BeautifulSoup(post.content)
         self.assertTrue(soup.find('input', id="id_twitter"))
         self.assertTrue(soup.find('input', id="id_facebook"))
 
-        post_social = self.client.post(next_url, {
+        post = self.client.post(post.request['PATH_INFO'], {
             'twitter': 'http://twitter.com/localbase',
             'facebook': 'http://facebook.com/localbase'
-        })
+        }, follow=True)
 
-        self.assertEquals(post_social.status_code, 200)
+        self.assertEquals(post.status_code, 200)
         self.assertEquals(post.content, 'All done')

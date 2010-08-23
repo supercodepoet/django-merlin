@@ -11,14 +11,11 @@ class MockWizard(SessionWizard):
 
     def process_step(self, request, current_step, form):
         if current_step.slug == 'user-details':
-            new_step = Step('few-more-things', forms.FewMoreThingsForm)
-            self.insert_after(request, current_step, new_step)
+            few_more_things_step = Step('few-more-things', forms.FewMoreThingsForm)
+            self.insert_after(request, current_step, few_more_things_step)
 
-        elif current_step.slug == 'few-more-things':
-            new_step = Step('social-info', forms.SocialForm)
-            step = self.get_step(request, 'contact-details')
-            self.insert_before(request, step, new_step)
+            social_step = Step('social-info', forms.SocialForm)
+            contact_step = self.get_step(request, 'contact-details')
+            self.insert_before(request, contact_step, social_step)
 
-        elif current_step.slug == 'social-info':
-            step = self.get_step(request, 'contact-details')
-            self.remove_step(request, step)
+            self.remove_step(request, contact_step)

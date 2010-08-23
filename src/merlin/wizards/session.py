@@ -280,7 +280,7 @@ class SessionWizard(object):
         steps = self.get_steps(request)
 
         if step not in steps:
-            index = steps.index(current_step) - 1
+            index = steps.index(current_step)
             steps.insert(index, step)
             request.session.modified = True
 
@@ -304,8 +304,6 @@ class SessionWizard(object):
             index = steps.index(current_step) + 1
             steps.insert(index, step)
             request.session.modified = True
-
-        print steps
 
     def get_cleaned_data(self, request, step):
         """
