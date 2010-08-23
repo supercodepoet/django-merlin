@@ -70,8 +70,8 @@ class SessionWizard(object):
 
         return self.render_form(request, slug, form, {
             'current_step': step,
-            'previous_step': None,
-            'next_step': None,
+            'previous_step': self.get_before(request, step),
+            'next_step': self.get_after(request, step),
             'url_base': self._get_URL_base(request, slug),
             'extra_context': context
         })
@@ -83,13 +83,9 @@ class SessionWizard(object):
         return step
 
     def _get_URL_base(self, request, slug):
-        path = request.path
         index = request.path.find(slug)
 
-        if path.endswith('/'):
-            return path[:index]
-        else:
-            return path[:(index -1)]
+        return request.path[:index]
 
     def process_GET(self, request, slug):
         form_data = self.get_cleaned_data(request, slug)
@@ -118,6 +114,26 @@ class SessionWizard(object):
         except IndexError:
             return None
 
+    def get_before(self, request, step):
+        steps = self.get_steps(request)
+        index = steps.index(step)
+
+        try:
+            return steps[index - 1]
+
+        except IndexError:
+            return None
+
+    def get_after(self, request, step):
+        steps = self.get_steps(request)
+        index = steps.index(step)
+
+        try:
+            return steps[index + 1]
+
+        except IndexError:
+            return None
+
     def get_cleaned_data(self, request, slug):
         return self._get_state(request).form_data.get(slug, None)
 
@@ -132,7 +148,7 @@ class SessionWizard(object):
         Hook for specifying the path of a template to use for rendering this
         form.
         """
-        return ''
+        return 'forms/wizard.html'
 
     def render_form(self, request, slug, form, context):
         """
