@@ -1,23 +1,36 @@
-This file requires editing
-==========================
+Django Depiction
+================
 
-Note to the author: Please add something informative to this README *before*
-releasing your software, as `a little documentation goes a long way`_.  Both
-README.rst (this file) and NEWS.txt (release notes) will be included in your
-package metadata which gets displayed in the PyPI page for your project.
+What's this for
+---------------
 
-You can take a look at the README.txt of other projects, such as repoze.bfg
-(http://bfg.repoze.org/trac/browser/trunk/README.txt) for some ideas.
+The Django FormWizard was not exactly what we were looking for so we decided to
+scratch our own itch and create a project that would host different types
+of form wizards for use with Django. Currently we have a SessionWizard, which is
+a form wizard that is backed by the Django session object. This wizard provides
+the ability to use the SessionWizard as a callable in the URlConf but still
+provide thread safety.
 
-.. _`a little documentation goes a long way`: http://www.martinaspeli.net/articles/a-little-documentation-goes-a-long-way
+Besides the storage of SessionWizard state being in session, it uses an HTTP
+GET to render a form and a POST to process a form. This differs from the
+Django FormWizard which uses POST for everything. One benefit of this is the
+ability to got to previous steps in the wizard.
+
+For more detailed information check out the docs associated with this
+project.
+
+Installation
+------------
+
+You need Django for this to work, if you need help with that `head here
+<http://djangoproject.com>`_
+
+Using Pip::
+
+    pip install django-merlin
 
 Credits
 -------
 
-- `Distribute`_
-- `Buildout`_
-- `modern-package-template`_
-
-.. _Buildout: http://www.buildout.org/
-.. _Distribute: http://pypi.python.org/pypi/distribute
-.. _`modern-package-template`: http://pypi.python.org/pypi/modern-package-template
+This was mostly inspired by the SessionWizard snippet
+located `here<http://djangosnippets.org/snippets/1078/>`_
