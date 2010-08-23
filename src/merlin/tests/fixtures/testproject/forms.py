@@ -13,3 +13,12 @@ class ContactDetailsForm(forms.Form):
     state = forms.CharField()
     zipcode = forms.CharField()
     phone = forms.CharField()
+
+
+class FewMoreThingsForm(forms.Form):
+    bio = forms.CharField()
+
+
+class SocialForm(forms.Form):
+    twitter = forms.URLField()
+    facebook = forms.URLField()

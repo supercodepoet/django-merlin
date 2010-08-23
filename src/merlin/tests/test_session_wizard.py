@@ -113,3 +113,52 @@ class SessionWizardTest(TestCase):
         except Exception as e:
             self.fail("We should have raised a not implemented error, " \
                 "instead the exception was %s" % e)
+
+
+class MockWizardTest(TestCase):
+    @attr('focus')
+    def test_mock_wizard(self):
+        response = self.client.get('/bettertest/user-details')
+        self.assertEquals(response.status_code, 200)
+
+        soup = BeautifulSoup(response.content)
+        self.assertTrue(soup.find('input', id='id_first_name'))
+        self.assertTrue(soup.find('input', id='id_last_name'))
+        self.assertTrue(soup.find('input', id='id_email'))
+
+        post = self.client.post('/bettertest/user-details', {
+            'first_name': 'Chad',
+            'last_name': 'Gallemore',
+            'email': 'cgallemore@gmail.com'
+        })
+        self.assertEquals(post.status_code, 302)
+        redirect_location = post._headers["location"][1]
+        next_url = redirect_location.split('http://testserver')[1]
+
+        few_more_things_form = self.client.get(next_url)
+        self.assertEquals(few_more_things_form.status_code, 200)
+
+        soup = BeautifulSoup(few_more_things_form.content)
+        self.assertTrue(soup.find('input', id="id_bio"))
+
+        post_few_more_things = self.client.post(next_url, {
+            'bio': 'My bio'
+        })
+        self.assertEquals(post_few_more_things.status_code, 302)
+        redirect_location = post_few_more_things._headers["location"][1]
+        next_url = redirect_location.split('http://testserver')[1]
+
+        social_form = self.client.get(next_url)
+        self.assertEquals(social_form.status_code, 200)
+
+        soup = BeautifulSoup(social_form.content)
+        self.assertTrue(soup.find('input', id="id_twitter"))
+        self.assertTrue(soup.find('input', id="id_facebook"))
+
+        post_social = self.client.post(next_url, {
+            'twitter': 'http://twitter.com/localbase',
+            'facebook': 'http://facebook.com/localbase'
+        })
+
+        self.assertEquals(post_social.status_code, 200)
+        self.assertEquals(post.content, 'All done')

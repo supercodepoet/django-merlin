@@ -167,12 +167,16 @@ class SessionWizard(object):
             index = steps.index(current_step) - 1
             steps.insert(index, step)
 
+        print self.get_steps(request)
+
     def insert_after(self, request, current_step, step):
         steps = self.get_steps(request)
 
         if step not in steps:
             index = steps.index(current_step) + 1
             steps.insert(index, step)
+
+        print self.get_steps(request)
 
     def get_cleaned_data(self, request, step):
         return self._get_state(request).form_data.get(step.slug, None)
@@ -190,7 +194,7 @@ class SessionWizard(object):
         """
         pass
 
-    def process_step(self, request, form, step):
+    def process_step(self, request, step, form):
         """
         Hook for modifying the StepWizard's internal state, given a fully
         validated Form object. The Form is guaranteed to have clean, valid
