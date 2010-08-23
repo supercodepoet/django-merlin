@@ -104,24 +104,23 @@ class SessionWizard(object):
     def process_POST(self, request, step):
         form = step.form(request.POST)
 
-        if form.is_valid():
-            self.set_cleaned_data(request, step, form.cleaned_data)
-            self.process_step(request, step, form)
-            next_step = self.get_after(request, step)
+        if not form.is_valid():
+            return self._show_form(request, step, form)
 
-            if next_step:
-                url_base = self._get_URL_base(request, step)
+        self.set_cleaned_data(request, step, form.cleaned_data)
+        self.process_step(request, step, form)
+        next_step = self.get_after(request, step)
 
-                return HttpResponseRedirect(urljoin(url_base, next_step.slug))
+        if next_step:
+            url_base = self._get_URL_base(request, step)
 
-            else:
-                try:
-                    return self.done(request)
+            return HttpResponseRedirect(urljoin(url_base, next_step.slug))
 
-                finally:
-                    self.clear(request)
+        else:
+            response =  self.done(request)
+            self.clear(request)
 
-        return self._show_form(request, step, form)
+            return response
 
     def get_steps(self, request):
         return self._get_state(request).steps

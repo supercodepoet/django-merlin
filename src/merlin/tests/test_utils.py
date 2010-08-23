@@ -22,3 +22,19 @@ class UtilsTestCase(unittest.TestCase):
         self.assertListEqual(state.steps, [step1, step2])
         self.assertEqual(state.current_step, step1)
         self.assertDictEqual(state.form_data, {})
+
+    def test_step_object_methods(self):
+        step1 = Step('step1', ContactDetailsForm)
+        step1_copy = Step('step1', UserDetailsForm)
+        step2 = Step('step2', UserDetailsForm)
+
+        self.assertRaises(ValueError, Step, 'step1', Step)
+
+        self.assertTrue(step1 == step1_copy)
+        self.assertFalse(step1 == step2)
+        self.assertFalse(step1 == 'step1')
+        self.assertTrue(step1 != step2)
+        self.assertFalse(step1 != step1_copy)
+
+        self.assertEquals(str(step1), 'step1')
+        self.assertEquals(unicode(step1), u'step1')
