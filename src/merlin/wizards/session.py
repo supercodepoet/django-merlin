@@ -114,7 +114,11 @@ class SessionWizard(object):
                 return HttpResponseRedirect(urljoin(url_base, next_step.slug))
 
             else:
-                return self.done(request)
+                try:
+                    return self.done(request)
+
+                finally:
+                    self.clear(request)
 
         return self._show_form(request, slug, form)
 
@@ -150,11 +154,34 @@ class SessionWizard(object):
         except IndexError:
             return None
 
+    def remove_step(self, request, step):
+        steps = self.get_steps(request)
+
+        if step in steps:
+            steps.remove(step)
+
+    def insert_before(self, request, current_step, step):
+        steps = self.get_steps(request)
+
+        if step not in steps:
+            index = steps.index(current_step) - 1
+            steps.insert(index, step)
+
+    def insert_after(self, request, current_step, step):
+        steps = self.get_steps(request)
+
+        if step not in steps:
+            index = steps.index(current_step) + 1
+            steps.insert(index, step)
+
     def get_cleaned_data(self, request, slug):
         return self._get_state(request).form_data.get(slug, None)
 
     def set_cleaned_data(self, request, slug, data):
         self._get_state(request).form_data[slug] = data
+
+    def clear(self, request):
+        del request.session[self.id]
 
     # METHODS SUBCLASSES MIGHT OVERRIDE IF APPROPRIATE #
     def process_show_form(self, request, slug, form):
