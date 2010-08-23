@@ -130,7 +130,8 @@ class MockWizardTest(TestCase):
             'first_name': 'Chad',
             'last_name': 'Gallemore',
             'email': 'cgallemore@gmail.com'
-        })
+        }, follow=True)
+
         self.assertEquals(post.status_code, 302)
         redirect_location = post._headers["location"][1]
         next_url = redirect_location.split('http://testserver')[1]

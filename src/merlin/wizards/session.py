@@ -58,8 +58,8 @@ class SessionWizard(object):
         Initialize the step list for the session if needed and call the proper
         HTTP method handler.
         """
-        print self.id
         self._init_wizard(request)
+
         slug = kwargs.get('slug', None)
         step = self.get_step(request, slug)
 
@@ -261,6 +261,7 @@ class SessionWizard(object):
 
         if step in steps:
             steps.remove(step)
+            request.session.modified = True
 
     def insert_before(self, request, current_step, step):
         """
@@ -281,8 +282,7 @@ class SessionWizard(object):
         if step not in steps:
             index = steps.index(current_step) - 1
             steps.insert(index, step)
-
-        print self.get_steps(request)
+            request.session.modified = True
 
     def insert_after(self, request, current_step, step):
         """
@@ -303,8 +303,9 @@ class SessionWizard(object):
         if step not in steps:
             index = steps.index(current_step) + 1
             steps.insert(index, step)
+            request.session.modified = True
 
-        print self.get_steps(request)
+        print steps
 
     def get_cleaned_data(self, request, step):
         """
@@ -334,6 +335,7 @@ class SessionWizard(object):
             The cleaned ``Form`` data to store.
         """
         self._get_state(request).form_data[step.slug] = data
+        request.session.modified = True
 
     def clear(self, request):
         """
