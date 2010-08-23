@@ -1,3 +1,4 @@
+from functools import wraps
 from urlparse import urljoin
 from uuid import uuid4
 
@@ -6,6 +7,16 @@ from django.shortcuts import render_to_response
 from django.template.context import RequestContext
 
 from merlin.wizards.utils import *
+
+
+def modifies_session(func):
+    @wraps(func)
+    def wrapper(request, *args, **kwargs):
+        result = func(request, *args, **kwargs)
+        request.session.modified = True
+
+        return result
+    return wrapper
 
 
 class SessionWizard(object):
@@ -246,6 +257,7 @@ class SessionWizard(object):
         except IndexError:
             return None
 
+    @modifies_session
     def remove_step(self, request, step):
         """
         Removes step from the wizard sequence.
@@ -261,8 +273,8 @@ class SessionWizard(object):
 
         if step in steps:
             steps.remove(step)
-            request.session.modified = True
 
+    @modifies_session
     def insert_before(self, request, current_step, step):
         """
         Inserts a new step into the wizard sequence before the provided step.
@@ -282,8 +294,8 @@ class SessionWizard(object):
         if step not in steps:
             index = steps.index(current_step)
             steps.insert(index, step)
-            request.session.modified = True
 
+    @modifies_session
     def insert_after(self, request, current_step, step):
         """
         Inserts a new step into the wizard sequence after the provided step.
@@ -303,7 +315,6 @@ class SessionWizard(object):
         if step not in steps:
             index = steps.index(current_step) + 1
             steps.insert(index, step)
-            request.session.modified = True
 
     def get_cleaned_data(self, request, step):
         """
@@ -318,6 +329,7 @@ class SessionWizard(object):
         """
         return self._get_state(request).form_data.get(step.slug, None)
 
+    @modifies_session
     def set_cleaned_data(self, request, step, data):
         """
         Sets the cleaned form data for the provided step.
@@ -333,7 +345,6 @@ class SessionWizard(object):
             The cleaned ``Form`` data to store.
         """
         self._get_state(request).form_data[step.slug] = data
-        request.session.modified = True
 
     def clear(self, request):
         """
