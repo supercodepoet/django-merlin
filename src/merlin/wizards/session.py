@@ -68,7 +68,7 @@ class SessionWizard(object):
     def _show_form(self, request, slug, form):
         context = self.process_show_form(request, slug, form)
 
-        self._set_current_step(request, slug)
+        step = self._set_current_step(request, slug)
 
         return self.render_form(request, slug, form, {
 
@@ -77,6 +77,8 @@ class SessionWizard(object):
     def _set_current_step(self, request, slug):
         step = self.get_step(request, slug)
         self._get_state(request).current_step = step
+
+        return step
 
     def process_GET(self, request, slug):
         form_data = self.get_cleaned_data(request, slug)
