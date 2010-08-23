@@ -1,5 +1,7 @@
+from BeautifulSoup import BeautifulSoup
 from django.core.urlresolvers import reverse
 from django.test import TestCase
+from nose.plugins.attrib import attr
 
 from merlin.tests.fixtures.testproject import forms
 from merlin.wizards.session import SessionWizard
@@ -34,8 +36,21 @@ class SessionWizardTest(TestCase):
         except Exception as e:
             self.fail("We should only fail with a TypeError, exception was %s" % e)
 
-    def test_steps(self):
-        url = reverse('simpletest',
-                kwargs={'slug': 'user-details'})
+    @attr('focus')
+    def test_session_wizard_no_slug(self):
+        response = self.client.get('/simpletest')
+        self.assertEquals(response.status_code, 404)
 
-        response = self.client.get(url)
+    def test_session_wizard(self):
+        response = self.client.get('/simpletest/user-details')
+        self.assertEquals(response.status_code, 200)
+
+        soup = BeautifulSoup(response.content)
+        self.assertTrue(soup.find('input', id='id_first_name'))
+        self.assertTrue(soup.find('input', id='id_last_name'))
+        self.assertTrue(soup.find('input', id='id_email'))
+        self.assertTrue(soup.find('a', href="/simpletest/contact-details"))
+        self.assertFalse(soup.find('a', text="Back"))
+
+        post = self.client.post('/simpletest/user-details')
+        self.assertEquals(response.status_code, 302)
