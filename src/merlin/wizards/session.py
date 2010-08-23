@@ -105,7 +105,7 @@ class SessionWizard(object):
             return None
 
     def get_cleaned_data(self, request, slug):
-        return self._get_state(request).data.get(slug, None)
+        return self._get_state(request).form_data.get(slug, None)
 
     # METHODS SUBCLASSES MIGHT OVERRIDE IF APPROPRIATE #
     def process_show_form(self, request, slug, form):
