@@ -1,21 +1,19 @@
 from collections import namedtuple
 from uuid import uuid4
 
-from django import forms
 from django.http import *
+
+from merlin.wizards.utils import Step
 
 
 _WizardState = namedtuple('_WizardState', ('steps', 'current_step', 'data'))
 
 
 class SessionWizard(object):
-    """
-    Add docs
-    """
-
+    # TODO: add class documentation
     def __init__(self, steps):
-        if [step for step in steps if not isinstance(step, forms.Form)]:
-            raise TypeError('Forms but be of type Django Form.')
+        if [step for step in steps if not isinstance(step, Step)]:
+            raise TypeError('All steps must be an instance of Step')
 
         slugs = set([step.slug for step in steps])
 
@@ -64,14 +62,62 @@ class SessionWizard(object):
 
             request.session[self.id] = wizard_state
 
+    def _get_state(self, request):
+        return request.session.get[self.id]
+
+    def _show_form(self, request, slug, form):
+        context = self.process_show_form(request, slug, form)
+
+        self._set_current_step(request, slug)
+
+        return self.render_form(request, slug, form, {
+
+        })
+
+    def _set_current_step(self, request, slug):
+        step = self.get_step(request, slug)
+        self._get_state(request).current_step = step
+
     def process_GET(self, request, slug):
-        pass
+        form_data = self.get_cleaned_data(request, slug)
+        step = self.get_step(request, slug)
+
+        if form_data:
+            form = step.form(initial=form_data)
+
+        else:
+            form = step.form()
+
+        return self._show_form(request, slug, form)
 
     def process_POST(self, request, slug):
         pass
 
     def get_steps(self, request):
+        return self._get_state(request).steps
+
+    def get_step(self, request, slug):
+        steps = self.get_steps(request)
+
+        try:
+            return [step for step in steps if step.slug == slug][0]
+
+        except IndexError:
+            return None
+
+    def get_cleaned_data(self, request, slug):
+        return self._get_state(request).data.get(slug, None)
+
+    # METHODS SUBCLASSES MIGHT OVERRIDE IF APPROPRIATE #
+    def process_show_form(self, request, slug, form):
         """
-        Pull the steps associated with this session
+        Called before rendering a form either from a GET or when a form submit
+        is invalid. This can be used to return extra context for the form
+        rendering.
         """
-        return request.session.get(self.id).steps
+
+    def get_template(self, request, slug, form):
+        pass
+
+    def render_form(self, request, slug, form, context):
+        pass
