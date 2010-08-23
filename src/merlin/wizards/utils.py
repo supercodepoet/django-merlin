@@ -38,6 +38,8 @@ class Step(object):
 
 class WizardState(UserDict):
     def __init__(self, *args, **kwargs):
+        UserDict.__init__(self, *args, **kwargs)
+
         self.steps = kwargs.get('steps', None)
         self.current_step = kwargs.get('current_step', None)
         self.form_data = kwargs.get('form_data', None)
