@@ -38,3 +38,5 @@ class UtilsTestCase(unittest.TestCase):
 
         self.assertEquals(str(step1), 'step1')
         self.assertEquals(unicode(step1), u'step1')
+
+        self.assertEquals('Step: %s' % repr(step1), 'Step: step1')
