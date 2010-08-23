@@ -426,6 +426,6 @@ class SessionWizard(object):
             A ``HttpRequest`` object that carries along with it the session
             used to access the wizard state.
         """
-        raise NotImplementedError("Your %s class has not defined a done() " + \
+        raise NotImplementedError("Your %s class has not defined a done() " \
                                   "method, which is required." \
                                   % self.__class__.__name__)
