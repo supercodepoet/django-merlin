@@ -35,15 +35,19 @@ class SessionWizard(object):
         """
         self._init_wizard(request)
         slug = kwargs.get('slug', None)
+        step = self.get_step(request, slug)
 
         if not slug:
+            raise Http404()
+
+        if not step:
             raise Http404()
 
         try:
             method_name = 'process_%s' % request.method
             method = getattr(self, method_name)
 
-            return method(request, slug)
+            return method(request, step)
 
         except AttributeError:
             raise Http404()
@@ -64,33 +68,30 @@ class SessionWizard(object):
     def _get_state(self, request):
         return request.session[self.id]
 
-    def _show_form(self, request, slug, form):
-        context = self.process_show_form(request, slug, form)
-        step = self._set_current_step(request, slug)
+    def _show_form(self, request, step, form):
+        context = self.process_show_form(request, step, form)
 
-        return self.render_form(request, slug, form, {
+        return self.render_form(request, step, form, {
             'current_step': step,
             'form': form,
             'previous_step': self.get_before(request, step),
             'next_step': self.get_after(request, step),
-            'url_base': self._get_URL_base(request, slug),
+            'url_base': self._get_URL_base(request, step),
             'extra_context': context
         })
 
-    def _set_current_step(self, request, slug):
-        step = self.get_step(request, slug)
+    def _set_current_step(self, request, step):
         self._get_state(request).current_step = step
 
         return step
 
-    def _get_URL_base(self, request, slug):
-        index = request.path.find(slug)
+    def _get_URL_base(self, request, step):
+        index = request.path.find(step.slug)
 
         return request.path[:index]
 
-    def process_GET(self, request, slug):
-        form_data = self.get_cleaned_data(request, slug)
-        step = self.get_step(request, slug)
+    def process_GET(self, request, step):
+        form_data = self.get_cleaned_data(request, step)
 
         if form_data:
             form = step.form(initial=form_data)
@@ -98,19 +99,18 @@ class SessionWizard(object):
         else:
             form = step.form()
 
-        return self._show_form(request, slug, form)
+        return self._show_form(request, step, form)
 
-    def process_POST(self, request, slug):
-        step = self.get_step(request, slug)
+    def process_POST(self, request, step):
         form = step.form(request.POST)
 
         if form.is_valid():
-            self.set_cleaned_data(request, slug, form.cleaned_data)
-            self.process_step(request, slug, step, form)
+            self.set_cleaned_data(request, step, form.cleaned_data)
+            self.process_step(request, step, form)
             next_step = self.get_after(request, step)
 
             if next_step:
-                url_base = self._get_URL_base(request, slug)
+                url_base = self._get_URL_base(request, step)
 
                 return HttpResponseRedirect(urljoin(url_base, next_step.slug))
 
@@ -121,7 +121,7 @@ class SessionWizard(object):
                 finally:
                     self.clear(request)
 
-        return self._show_form(request, slug, form)
+        return self._show_form(request, step, form)
 
     def get_steps(self, request):
         return self._get_state(request).steps
@@ -175,23 +175,23 @@ class SessionWizard(object):
             index = steps.index(current_step) + 1
             steps.insert(index, step)
 
-    def get_cleaned_data(self, request, slug):
-        return self._get_state(request).form_data.get(slug, None)
+    def get_cleaned_data(self, request, step):
+        return self._get_state(request).form_data.get(step.slug, None)
 
-    def set_cleaned_data(self, request, slug, data):
-        self._get_state(request).form_data[slug] = data
+    def set_cleaned_data(self, request, step, data):
+        self._get_state(request).form_data[step.slug] = data
 
     def clear(self, request):
         del request.session[self.id]
 
     # METHODS SUBCLASSES MIGHT OVERRIDE IF APPROPRIATE #
-    def process_show_form(self, request, slug, form):
+    def process_show_form(self, request, step, form):
         """
         Hook for providing extra context to the rendering of the form.
         """
         pass
 
-    def process_step(self, request, slug, form, step):
+    def process_step(self, request, form, step):
         """
         Hook for modifying the StepWizard's internal state, given a fully
         validated Form object. The Form is guaranteed to have clean, valid
@@ -205,18 +205,18 @@ class SessionWizard(object):
         """
         pass
 
-    def get_template(self, request, slug, form):
+    def get_template(self, request, step, form):
         """
         Hook for specifying the path of a template to use for rendering this
         form.
         """
         return 'forms/wizard.html'
 
-    def render_form(self, request, slug, form, context):
+    def render_form(self, request, step, form, context):
         """
         Hook for altering how the form is rendered to the response.
         """
-        return render_to_response(self.get_template(request, slug, form),
+        return render_to_response(self.get_template(request, step, form),
             context, RequestContext(request))
 
     def done(self, request):
