@@ -92,7 +92,7 @@ class SessionWizardTest(TestCase):
         self.assertTrue(soup.find('a', href="/simpletest/user-details"))
 
         try:
-            post_last = self.client.post(next_url, {
+            post_last = self.client.post(post.request['PATH_INFO'], {
                 'street_address': '122 Main St.',
                 'city': 'Joplin',
                 'state': 'MO',
