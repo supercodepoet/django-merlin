@@ -43,7 +43,7 @@ How is ``SessionWizard`` different?
        the ``SessionWizard`` starts it makes a copy of the
        :ref:`Step <api_step>` list for the session so it can be manipulated
        independantly of any other session.
-    3. The :ref:`SessionWizard <api_sessionwizard>` process all ``GET`` requests
+    3. The :ref:`SessionWizard <api_sessionwizard>` processes all ``GET`` requests
        as a form view and only moves to the next step in the sequence on a
        succesful ``POST`` request. This allows for the browser's Back button
        to function correctly.
@@ -85,7 +85,7 @@ How it works
        that have occured. If the data is valid then the wizard stores the
        clean data in its state object.
     5. If there is another step in the process the wizard sends a redirect to
-       the user to the next step in the sequence. If not next step is found
+       the user to the next step in the sequence. If no next step is found
        the wizard then calls the ``done`` method, which expects to return
        some ``HttpResponse`` to the user letting them know they are
        finished with the process.
@@ -122,9 +122,9 @@ sure to check out the API docs for :ref:`SessionWizard <api_sessionwizard>`.
     * :meth:`~SessionWizard.process_step()` -- allows for changing the internal
       state of the wizard. For example, you could use this hook to add or remove
       steps in the process based off some user submitted information. You can
-      use the methods to :meth:`~SessionWizard.remove_step()`,
+      use the methods :meth:`~SessionWizard.remove_step()`,
       :meth:`~SessionWizard.insert_before()` and
-      :meth:`~SessionWizard.insert_after()` accomplish this.
+      :meth:`~SessionWizard.insert_after()` to accomplish this.
     * :meth:`~SessionWizard.get_template()` -- allows you to return a template
       path to use for processing the currently executing step.
     * :meth:`~SessionWizard.render_form()` -- allows you the ability to render
