@@ -1,7 +1,5 @@
 from BeautifulSoup import BeautifulSoup
-from django.core.urlresolvers import reverse
 from django.test import TestCase
-from nose.plugins.attrib import attr
 
 from merlin.tests.fixtures.testproject import forms
 from merlin.wizards.session import SessionWizard
@@ -77,15 +75,13 @@ class SessionWizardTest(TestCase):
             'first_name': 'Chad',
             'last_name': 'Gallemore',
             'email': 'cgallemore@gmail.com'
-        })
-        self.assertEquals(post.status_code, 302)
-        redirect_location = post._headers["location"][1]
-        next_url = redirect_location.split('http://testserver')[1]
+        }, follow=True)
 
-        next_form = self.client.get(next_url)
-        self.assertEquals(next_form.status_code, 200)
+        self.assertEquals(post.redirect_chain[0],
+            ('http://testserver/simpletest/contact-details', 302))
+        self.assertEquals(post.status_code, 200)
 
-        soup = BeautifulSoup(next_form.content)
+        soup = BeautifulSoup(post.content)
         self.assertTrue(soup.find('input', id="id_street_address"))
         self.assertTrue(soup.find('input', id="id_city"))
         self.assertTrue(soup.find('input', id="id_state"))
@@ -96,7 +92,7 @@ class SessionWizardTest(TestCase):
         self.assertTrue(soup.find('a', href="/simpletest/user-details"))
 
         try:
-            post_last = self.client.post(next_url, {
+            post_last = self.client.post(post.request['PATH_INFO'], {
                 'street_address': '122 Main St.',
                 'city': 'Joplin',
                 'state': 'MO',
@@ -116,7 +112,7 @@ class SessionWizardTest(TestCase):
 
 
 class MockWizardTest(TestCase):
-    @attr('focus')
+
     def test_mock_wizard(self):
         response = self.client.get('/bettertest/user-details')
         self.assertEquals(response.status_code, 200)
