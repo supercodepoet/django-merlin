@@ -17,7 +17,7 @@ Django FormWizard which uses POST for everything. One benefit of this is the
 ability to got to previous steps in the wizard.
 
 For more detailed information check out the docs associated with this
-project.
+project found at: http://packages.python.org/django-merlin/
 
 Installation
 ------------
