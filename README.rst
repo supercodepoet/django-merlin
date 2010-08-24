@@ -32,5 +32,5 @@ Using Pip::
 Credits
 -------
 
-This was mostly inspired by the SessionWizard snippet
+This was mostly inspired by the Django form wizard and the SessionWizard snippet
 located `here <http://djangosnippets.org/snippets/1078/>`_
