@@ -346,6 +346,18 @@ class SessionWizard(object):
         """
         self._get_state(request).form_data[step.slug] = data
 
+    def get_form_data(self, request):
+        """
+        This will return the form_data dictionary that has been saved in the
+        session.  This will mainly be used in the done to query for the form_data
+        that has been saved throughout the wizard process.
+
+        :param request:
+            A ``HttpRequest`` object that carries along with it the session
+            used to access the wizard state.
+        """
+        return request.session[self.id]['form_data']
+
     def clear(self, request):
         """
         Removes the internal wizard state from the session
