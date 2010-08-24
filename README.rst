@@ -1,5 +1,5 @@
-Django Depiction
-================
+Django Merlin
+=============
 
 What's this for
 ---------------
