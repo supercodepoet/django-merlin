@@ -8,27 +8,31 @@ __all__ = ('Step', 'WizardState',)
 
 class Step(object):
     """
-    Wrapper for providing a :class:`SessionWizard` with a ``Form`` sequence to
-    process.
+    When constucting a form wizard, the wizard needs to be composed of a
+    sequental series of steps in which it is to display forms to the user and
+    collect the data from those forms. To be able to provide these forms to the
+    :ref:`SessionWizard <api_sessionwizard>`, you must first wrap the Django
+    :class:`django.forms.Form` in a ``Step`` object. The ``Step`` object gives
+    the ability to store the :class:`django.forms.Form` class to be used, as
+    well as, a unique slug to be used in the wizard navigation.
+
+    .. versionadded:: 0.1
+
+    :param slug:
+        Each step in the wizard should have a unique "slug" that identifies that
+        ``Step`` in the process. By using slugs the wizard has the ability to go
+        forward, as well as, back in the process adjusting what data it collects
+        from the user.
+
+    :param form:
+        This *MUST* be a subclass of :class:`django.forms.Form`. This should not
+        be an instance of that subclass. The
+        :ref:`SessionWizard <api_sessionwizard>` will use this class to create
+        instances for the user. If going back in the wizard process, the
+        :ref:`SessionWizard <api_sessionwizard>` will prepopulate the
+        form with any cleaned data already collected.
     """
     def __init__(self, slug, form):
-        """
-        Contructs a new ``Step`` object by providing a slug and a ``Form`` to
-        be used for this step in the sequnce.
-
-        e.g.::
-
-            Step('user-details', UserDetailsForm)
-
-        :param slug:
-            The unique identifer for this :class:`Step`. This slug is used
-            throughout the :class:`SessionWizard` for navigating to the
-            proper form for rendering.
-
-        :param form:
-            An Django ``Form`` subclass that should be used for this step in
-            the sequence.
-        """
         if not issubclass(form, forms.Form):
             raise ValueError('Form must be subclass of a Django Form')
 
@@ -59,9 +63,26 @@ class Step(object):
 
 class WizardState(UserDict):
     """
-    Provides the ability for a :class:`SessionWizard` to keep track of its
-    state by storing the list of steps, the currently executing step and any
-    validated form data for the steps.
+    This class provides the ability for a
+    :ref:`SessionWizard <api_sessionwizard>` to keep track of the important
+    state of a multi-step form. Instead of keeping track of the state through
+    :samp:`<input type="hidden">` fields, it subclasses the python ``UserDict``
+    object and stores its data in the properties ``steps``,``current_step``
+    and ``form_data``.
+
+    .. versionadded:: 0.1
+
+    :param steps:
+        A list of the :ref:`Step <api_step>` objects that provide the sequence
+        in which the forms should be presented to the user.
+
+    :param current_step:
+        The current :ref:`Step <api_step>` that the user is currently on.
+
+    :param form_data:
+        A ``dict`` of the cleaned form data collected to this point and
+        referenced using the :ref:`Step <api_step>`'s slug as the key to
+        the ``dict``
     """
     def __init__(self, *args, **kwargs):
         UserDict.__init__(self, *args, **kwargs)

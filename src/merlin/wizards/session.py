@@ -26,27 +26,16 @@ class SessionWizard(object):
     to a previous step or move on to the next step in the sequence. When the
     wizard runs out of steps it calls a final function that finishes the form
     process. This class should be subclassed and the subclass should at a
-    minimum override the done method.
+    minimum override the ``done`` method.
+
+    .. versionadded:: 0.1
+
+    :param steps:
+        Provides a list of :class:`Step` objects in the order in
+        which the wizard should display them to the user. This list can
+        be manipulated to add or remove steps as needed.
     """
     def __init__(self, steps):
-        """
-        Contructs a new ``SessionWizard`` object by providing a list of
-        steps the wizard should process.
-
-        e.g.::
-
-            class MyWizard(Sessionizard):
-                def done(self, request):
-                    return HttpResponse('Good Job!')
-
-            MyWizard([Step('user-details', UserDetailForm),
-                Step('contact-details', ContactDetailsForm)])
-
-        :param steps:
-            Provides a list of :class:`Step` objects in the order in
-            which the wizard should display them to the user. This list can
-            be manipulated to add or remove steps as needed.
-        """
         if not isinstance(steps, list):
             raise TypeError('steps must be an instance of or subclass of list')
 
