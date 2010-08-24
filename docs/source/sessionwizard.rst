@@ -59,15 +59,16 @@ Here is the basic workflow needed to use the ``SessionWizard`` object:
 
     1. Make sure you have enabled the Django session middleware.
     2. Create a subclass the ``SessionWizard`` class and override the
-       ``done`` method. The ``done`` method allows you to collect all of the
-       validated form data, process that data and move on to the next
-       web page after successful processing of the wizard.
-    3. Override the ``get_template`` method to return the path to the template
-       the forms should use. The default is to return "forms/wizard.html",
-       which you provide. Based on the step passed in you could return different
-       templates for different forms.
+       :meth:`~SessionWizard.done()` method. The :meth:`~SessionWizard.done()`
+       method allows you to collect all of the validated form data, process
+       that data and move on to the next web page after successful processing
+       of the wizard.
+    3. Override the :meth:`~SessionWizard.get_template()` method to return the
+       path to the template the forms should use. The default is to return
+       "forms/wizard.html", which you provide. Based on the step passed in
+       you could return different templates for different forms.
     4. Create a url that will be the entry point of your wizard. This url should
-       provide a (?P<slug>[A-Za-z0-9_-]+) option in the url pattern.
+       provide a ``(?P<slug>[A-Za-z0-9_-]+)`` option in the url pattern.
     5. Point this url to the subclass of ``SessionWizard``, providing a ``list``
        of :ref:`Step <api_step>` objects that the wizard should process in the
        order it should process them.
@@ -85,10 +86,10 @@ How it works
        that have occured. If the data is valid then the wizard stores the
        clean data in its state object.
     5. If there is another step in the process the wizard sends a redirect to
-       the user to the next step in the sequence. If no next step is found
-       the wizard then calls the ``done`` method, which expects to return
-       some ``HttpResponse`` to the user letting them know they are
-       finished with the process.
+       the user to the next step in the sequence. If not next step is found
+       the wizard then calls the :meth:`~SessionWizard.done()` method, which
+       expects to return some ``HttpResponse`` to the user letting them know
+       they are finished with the process.
 
 Creating templates for the forms
 ================================
@@ -143,3 +144,9 @@ provide even more form wizards to this tool chest. If you have any questions,
 comments or suggestions please email us at development@localbase.com. You can
 always particapte by using the projects GitHub account as well:
 http://github.com/localbase/django-merlin
+
+Credits
+=======
+
+This was mostly inspired by the Django form wizard and the SessionWizard snippet
+located `here <http://djangosnippets.org/snippets/1078/>`_
