@@ -147,6 +147,10 @@ class MockWizardTest(TestCase):
         self.assertTrue(soup.find('input', id="id_twitter"))
         self.assertTrue(soup.find('input', id="id_facebook"))
 
+        div = soup.find('div', id="global_id")
+
+        self.assertEquals(div.string, '123456789')
+
         post = self.client.post(post.request['PATH_INFO'], {
             'twitter': 'http://twitter.com/localbase',
             'facebook': 'http://facebook.com/localbase'

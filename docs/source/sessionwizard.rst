@@ -134,6 +134,10 @@ sure to check out the API docs for :ref:`SessionWizard <api_sessionwizard>`.
       to provide a :class:`PageAssembly` render method from the excellent
       django-crunchyfrog project found at :
       http://github.com/localbase/django-crunchyfrog
+    * :meth:`~SessionWizard.initialize()` -- alows you the ability to initialize
+      the wizard at each request. This can be used to put data into the
+      wizard state object that can then be used in the
+      :meth:`~SessionWizard.done()` method.
 
 
 Enjoy!

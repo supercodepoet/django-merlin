@@ -6,6 +6,14 @@
 News
 ====
 
+0.2
+---
+
+*Release date: 3-Nov-2010*
+
+* Added the initialize hook to the SessionWizard to allow per request initialization.
+
+
 0.1
 ---
 

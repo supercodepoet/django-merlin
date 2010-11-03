@@ -16,8 +16,7 @@ GET to render a form and a POST to process a form. This differs from the
 Django FormWizard which uses POST for everything. One benefit of this is the
 ability to got to previous steps in the wizard.
 
-For more detailed information check out the docs associated with this
-project found at: http://packages.python.org/django-merlin/
+Documentation and examples can be found at: http://packages.python.org/django-merlin/
 
 Installation
 ------------

@@ -40,3 +40,15 @@ class UtilsTestCase(unittest.TestCase):
         self.assertEquals(unicode(step1), u'step1')
 
         self.assertEquals('Step: %s' % repr(step1), 'Step: step1')
+
+    def test_wizard_expansion(self):
+        state = WizardState()
+
+        if not 'test_param' in state:
+            state.test_param = 'Test'
+
+        self.assertEquals(state.test_param, 'Test')
+
+        state.test_param = 'Test 2'
+
+        self.assertEquals(state.test_param, 'Test 2')

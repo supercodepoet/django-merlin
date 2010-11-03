@@ -91,6 +91,8 @@ class SessionWizard(object):
                 current_step=self.base_steps[0],
                 form_data={})
 
+        self.initialize(request, request.session[self.id])
+
     def _get_state(self, request):
         """
         Returns the :class:`WizardState` object used to manage this
@@ -354,6 +356,25 @@ class SessionWizard(object):
         del request.session[self.id]
 
     # METHODS SUBCLASSES MIGHT OVERRIDE IF APPROPRIATE ########################
+    def initialize(self, request, wizard_state):
+        """
+        Hook used to initialize the wizard subclass. This will be called for
+        every request to the wizard before it processes the GET or POST.
+
+        :param request:
+            A ``HttpRequest`` object for this request.
+
+        :param wizard_state:
+            The :class:`WizardState` object representing the current state of
+            the wizard. Extra information can be appended to the state so it
+            can be available to :class:`Step`'s of the wizard.
+
+            For example::
+                if 'profile' not in wizard_state:
+                    wizard_state.profile = request.user.get_profile()
+        """
+        pass
+
     def process_show_form(self, request, step, form):
         """
         Hook used for providing extra context that can be used in the

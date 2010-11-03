@@ -6,6 +6,10 @@ from merlin.wizards.utils import Step
 
 
 class MockWizard(SessionWizard):
+    def initialize(self, request, wizard_state):
+        if not 'global_id' in wizard_state:
+            wizard_state.global_id = '123456789'
+
     def done(self, request):
         form_data = self.get_form_data(request)
         assert form_data['user-details']['first_name'] == 'Chad'
@@ -27,3 +31,15 @@ class MockWizard(SessionWizard):
             self.insert_before(request, contact_step, social_step)
 
             self.remove_step(request, contact_step)
+
+    def get_template(self, request, step, form):
+        if step.slug == 'social-info':
+            return 'forms/social_wizard.html'
+
+        else:
+            return 'forms/wizard.html'
+
+    def process_show_form(self, request, step, form):
+        if step.slug == 'social-info':
+            return {
+                'global_id': self._get_state(request).global_id}
