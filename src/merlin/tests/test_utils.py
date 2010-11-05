@@ -44,11 +44,20 @@ class UtilsTestCase(unittest.TestCase):
     def test_wizard_expansion(self):
         state = WizardState()
 
-        if not 'test_param' in state:
+        if not hasattr(state, 'test_param'):
             state.test_param = 'Test'
 
-        self.assertEquals(state.test_param, 'Test')
+        self.assertEquals(state.test_param, 'Test')            
 
         state.test_param = 'Test 2'
 
         self.assertEquals(state.test_param, 'Test 2')
+
+        state = WizardState()
+        state.another_param = 'Another Test'
+
+        if not hasattr(state, 'another_param'):
+            self.fail('We should have the param')
+
+        else:
+            self.assertEquals(state.another_param, 'Another Test')
