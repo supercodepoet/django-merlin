@@ -50,7 +50,9 @@ class SessionWizard(object):
         if len(slugs) != len(steps):
             raise ValueError('Step slugs must be unique.')
 
-        self.id = str(uuid4())
+        clazz = self.__class__
+
+        self.id = '%s.%s' % (clazz.__module__, clazz.__name__,)
         self.base_steps = steps
 
     def __call__(self, request, *args, **kwargs):

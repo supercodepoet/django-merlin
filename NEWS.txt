@@ -6,6 +6,15 @@
 News
 ====
 
+0.3
+---
+
+*Release date: 30-Nov-2010*
+
+* Changed the way the id of the SessionWizard is generated to address problem of
+  lose of data in a multi-threaded/multi-process Django environment
+
+
 0.2
 ---
 
