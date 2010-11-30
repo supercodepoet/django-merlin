@@ -6,6 +6,18 @@
 News
 ====
 
+0.4
+---
+
+*Release date: 30-Nov-2010*
+
+* Fixed the bug where existing form data was not getting populated on a GET request.
+* Updated the process of process_POST to not automatically call self.clear().
+  The developer of the wizard now should call self.clear() right before a
+  successful return from self.done(). If the wizard needs to redirect to a step
+  in the process because of post processing error then the SessionWizard will
+  not remove the data form session now.
+
 0.3
 ---
 
