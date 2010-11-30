@@ -141,7 +141,7 @@ class SessionWizard(object):
         form_data = self.get_cleaned_data(request, step)
 
         if form_data:
-            form = step.form(initial=form_data)
+            form = step.form(form_data)
 
         else:
             form = step.form()
@@ -169,7 +169,7 @@ class SessionWizard(object):
             return HttpResponseRedirect(urljoin(url_base, next_step.slug))
 
         else:
-            response =  self.done(request)
+            response = self.done(request)
             self.clear(request)
 
             return response
