@@ -19,6 +19,8 @@ class MockWizard(SessionWizard):
         assert form_data['social-info']['twitter'] == 'http://twitter.com/localbase'
         assert form_data['social-info']['facebook'] == 'http://facebook.com/localbase'
 
+        self.clear(request)
+
         return HttpResponse("All done", mimetype="text/plain")
 
     def process_step(self, request, current_step, form):

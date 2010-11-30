@@ -1,6 +1,5 @@
 from functools import wraps
 from urlparse import urljoin
-from uuid import uuid4
 
 from django.http import *
 from django.shortcuts import render_to_response
@@ -169,10 +168,7 @@ class SessionWizard(object):
             return HttpResponseRedirect(urljoin(url_base, next_step.slug))
 
         else:
-            response = self.done(request)
-            self.clear(request)
-
-            return response
+            return self.done(request)
 
     def get_steps(self, request):
         """
@@ -353,7 +349,9 @@ class SessionWizard(object):
 
     def clear(self, request):
         """
-        Removes the internal wizard state from the session
+        Removes the internal wizard state from the session. This should be
+        called right be for the return from a successful
+        :meth:`~SessionWizard.done()` call.
         """
         del request.session[self.id]
 

@@ -62,7 +62,13 @@ Here is the basic workflow needed to use the ``SessionWizard`` object:
        :meth:`~SessionWizard.done()` method. The :meth:`~SessionWizard.done()`
        method allows you to collect all of the validated form data, process
        that data and move on to the next web page after successful processing
-       of the wizard.
+       of the wizard. You are able to redirect out of done if there are some
+       post processing errors you need the user to be notified of. If you have
+       processed everything correctly then you can call the
+       :meth:`~SessionWizard.clear()` method to clean up the data stored in
+       the session. If :meth:`~SessionWizard.clear()` is not called then the
+       next time the same session goes through the wizard the existing form
+       data from the original run will be put into the forms.
     3. Override the :meth:`~SessionWizard.get_template()` method to return the
        path to the template the forms should use. The default is to return
        "forms/wizard.html", which you provide. Based on the step passed in
