@@ -33,7 +33,7 @@ class Step(object):
         form with any cleaned data already collected.
     """
     def __init__(self, slug, form):
-        if not issubclass(form, forms.Form):
+        if not issubclass(form, (forms.Form, forms.ModelForm)):
             raise ValueError('Form must be subclass of a Django Form')
 
         self.slug = str(slug)
