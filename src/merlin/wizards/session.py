@@ -62,12 +62,19 @@ class SessionWizard(object):
         self._init_wizard(request)
 
         slug = kwargs.get('slug', None)
-        step = self.get_step(request, slug)
 
         if not slug:
             raise Http404()
 
+        step = self.get_step(request, slug)
+
         if not step:
+            if slug == 'cancel':
+                self.cancel(request)
+                redirect = request.REQUEST.get('rd', '/')
+
+                return HttpResponseRedirect(redirect)
+
             raise Http404()
 
         try:
@@ -374,6 +381,17 @@ class SessionWizard(object):
                     wizard_state.profile = request.user.get_profile()
         """
         pass
+
+    def cancel(self, request):
+        """
+        Hook used to cancel a wizard. This will be called when slug is passed
+        that matches "cancel". By default the method will clear the session
+        data.
+
+        :param request:
+            A ``HttpRequest`` object for this request.
+        """
+        self.clear(request)
 
     def process_show_form(self, request, step, form):
         """

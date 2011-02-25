@@ -140,11 +140,52 @@ sure to check out the API docs for :ref:`SessionWizard <api_sessionwizard>`.
       to provide a :class:`PageAssembly` render method from the excellent
       django-crunchyfrog project found at :
       http://github.com/localbase/django-crunchyfrog
-    * :meth:`~SessionWizard.initialize()` -- alows you the ability to initialize
-      the wizard at each request. This can be used to put data into the
-      wizard state object that can then be used in the
+    * :meth:`~SessionWizard.initialize()` -- allows you the ability to
+      initialize the wizard at each request. This can be used to put data into
+      the wizard state object that can then be used in the
       :meth:`~SessionWizard.done()` method.
 
+
+I am tired, can't I just cancel this wizard?
+============================================
+
+When you have a long form process and the user decides they don't want to
+finish the wizard you would to provide a Cancel button or link they can
+click that will reset the wizard and redirect the user to a different screen.
+It would be great if the `SessionWizard` provided a way to handle this and
+also clean up the data it has been tracking as well. Well pine no more because
+the `SessionWizard` has got your back!
+
+When you want to cancel a wizard you can just pass "cancel" as the step slug in
+the url. By just doing this the wizard will, by default, clear the session
+data it was tracking and send an `HttpResponseRedirect` to the / url. You can
+provide the query string parameter ?rd=yoururl to redirect to a different url.
+If you have a `Step` with the slug of "cancel" then the wizard will proceed to
+this step and you will have to handle the cancel action yourself.
+
+For example, let's say we have a wizard and url /mywizard and we have steps
+"form1" and "form2".
+
+    1. The user sends a GET request to /mywizard/form1.
+    2. The user fills out the form information and clicks the Next button.
+    3. The browser sends a POST request with the form data and the wizard
+       does its tricks and redirects the user to /mywizard/form2.
+    4. The user is sleepy and decides to come back tomorrow and finish the
+       wizard. The user then clicks the cancel link you have provided in
+       the template.
+    5. The cancel link in your template points to /mywizard/cancel?rd=/thanks.
+    6. The browser sends a GET request to /mywizard/cancel?rd=/thanks and the
+       `SessionWizard` sees it has no step called "cancel".
+    7. The `SessionWizard` calls its internal cancel method, which cleans up
+       any session and form data the wizard was tracking, and redirects the
+       user to /thanks!
+    8. No harm, no foul.
+
+
+    * :meth:`~SessionWizard.cancel()` -- cleans up the session data that has
+      been tracked by the wizard. You can override this method and provide
+      other features you would like when cancelling, for example; You could
+      track the cancel actions from wizards.
 
 Enjoy!
 ======

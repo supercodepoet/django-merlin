@@ -1,4 +1,5 @@
 from BeautifulSoup import BeautifulSoup
+from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from merlin.tests.fixtures.testproject import forms
@@ -109,6 +110,47 @@ class SessionWizardTest(TestCase):
         except Exception as e:
             self.fail("We should have raised a not implemented error, " \
                 "instead the exception was %s" % e)
+
+    def test_session_wizard_cancel_default(self):
+        response = self.client.get('/simpletest/user-details')
+        self.assertEquals(response.status_code, 200)
+
+        post = self.client.post('/simpletest/user-details', {
+            'first_name': 'Chad',
+            'last_name': 'Gallemore',
+            'email': 'cgallemore@gmail.com'
+        }, follow=True)
+
+        self.assertEquals(post.redirect_chain[0],
+            ('http://testserver/simpletest/contact-details', 302))
+        self.assertEquals(post.status_code, 200)
+
+        response = self.client.get('/simpletest/cancel', follow=True)
+
+        self.assertEquals(response.redirect_chain[0],
+            ('http://testserver/', 302))
+        self.assertEquals(response.status_code, 200)
+
+    def test_session_wizard_cancel_with_redirect(self):
+        response = self.client.get('/simpletest/user-details')
+        self.assertEquals(response.status_code, 200)
+
+        post = self.client.post('/simpletest/user-details', {
+            'first_name': 'Chad',
+            'last_name': 'Gallemore',
+            'email': 'cgallemore@gmail.com'
+        }, follow=True)
+
+        self.assertEquals(post.redirect_chain[0],
+            ('http://testserver/simpletest/contact-details', 302))
+        self.assertEquals(post.status_code, 200)
+
+        response = self.client.get('/simpletest/cancel?rd=%s' % reverse(
+            'test-more'), follow=True)
+
+        self.assertEquals(response.redirect_chain[0],
+            ('http://testserver/more', 302))
+        self.assertEquals(response.status_code, 200)
 
 
 class MockWizardTest(TestCase):

@@ -25,15 +25,15 @@ class Step(object):
         from the user.
 
     :param form:
-        This *MUST* be a subclass of :class:`django.forms.Form`. This should not
-        be an instance of that subclass. The
-        :ref:`SessionWizard <api_sessionwizard>` will use this class to create
-        instances for the user. If going back in the wizard process, the
-        :ref:`SessionWizard <api_sessionwizard>` will prepopulate the
-        form with any cleaned data already collected.
+        This *MUST* be a subclass of :class:`django.forms.Form` or
+        :class:`django.forms.ModelForm`. This should not be an instance of that
+        subclass. The :ref:`SessionWizard <api_sessionwizard>` will use this
+        class to create instances for the user. If going back in the wizard
+        process, the :ref:`SessionWizard <api_sessionwizard>` will prepopulate
+        the form with any cleaned data already collected.
     """
     def __init__(self, slug, form):
-        if not issubclass(form, (forms.Form, forms.ModelForm)):
+        if not issubclass(form, (forms.Form, forms.ModelForm,)):
             raise ValueError('Form must be subclass of a Django Form')
 
         self.slug = str(slug)
