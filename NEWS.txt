@@ -6,6 +6,15 @@
 News
 ====
 
+0.5
+---
+
+*Release date: 25-Nov-2011*
+
+* Merged a Pull Request to allow the SessionWizard to support Steps that use a
+  ModelForm instead of just a Form
+* Added the ability to cancel a wizard!
+
 0.4
 ---
 
