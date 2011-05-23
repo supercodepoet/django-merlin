@@ -5,6 +5,23 @@ from merlin.wizards.session import SessionWizard
 from merlin.wizards.utils import Step
 
 
+class FormSetWizard(SessionWizard):
+
+    def get_template(self, request, step, form):
+        return "forms/formset_wizard.html"
+
+    def done(self, request):
+        form_data = self.get_form_data(request)
+
+        assert len(form_data['user-details']) == 1
+        assert form_data['user-details'][0]['first_name'] == 'Yorgos'
+        assert form_data['user-details'][0]['last_name'] == 'Pagles'
+        assert form_data['user-details'][0]['email'] == 'yorgos@pagles.org'
+
+        self.clear(request)
+
+        return HttpResponse("All done", mimetype="text/plain")
+
 class MockWizard(SessionWizard):
     def initialize(self, request, wizard_state):
         if not 'global_id' in wizard_state:

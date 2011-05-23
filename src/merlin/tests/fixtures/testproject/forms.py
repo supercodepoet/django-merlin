@@ -1,11 +1,12 @@
 from django import forms
-
+from django.forms import formsets
 
 class UserDetailsForm(forms.Form):
     first_name = forms.CharField()
     last_name = forms.CharField()
     email = forms.EmailField()
 
+UserDetailsFormSet = formsets.formset_factory(UserDetailsForm)
 
 class ContactDetailsForm(forms.Form):
     street_address = forms.CharField()

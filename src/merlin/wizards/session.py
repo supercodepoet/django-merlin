@@ -59,6 +59,7 @@ class SessionWizard(object):
         Initialize the step list for the session if needed and call the proper
         HTTP method handler.
         """
+
         self._init_wizard(request)
 
         slug = kwargs.get('slug', None)
@@ -124,6 +125,22 @@ class SessionWizard(object):
             'extra_context': context
         })
 
+    def _show_formset(self, request, step, formset):
+        """
+        Render the provided formset for the provided step to the
+        response stream.
+        """
+        context = self.process_show_formset(request, step, formset)
+
+        return self.render_formset(request, step, formset, {
+            'current_step': step,
+            'formset': formset,
+            'previous_step': self.get_before(request, step),
+            'next_step': self.get_after(request, step),
+            'url_base': self._get_URL_base(request, step),
+            'extra_context': context
+        })
+
     def _set_current_step(self, request, step):
         """
         Sets the currenlty executing step.
@@ -146,12 +163,23 @@ class SessionWizard(object):
         """
         form_data = self.get_cleaned_data(request, step)
 
+        form = None
+        formset = None
+
         if form_data:
-            form = step.form(form_data)
-
+            if step.formset:
+                formset = step.formset(form_data)
+            else:
+                form = step.form(form_data)
         else:
-            form = step.form()
+            if step.formset:
+                formset = step.formset()
+            else:
+                form = step.form()
 
+        if formset:
+            return self._show_formset(request, step, formset)
+        
         return self._show_form(request, step, form)
 
     def process_POST(self, request, step):
@@ -160,13 +188,28 @@ class SessionWizard(object):
         next :class:`Step` in the sequence or finished the wizard process
         by calling ``self.done``
         """
-        form = step.form(request.POST)
 
-        if not form.is_valid():
+        form = None
+        formset = None
+
+        if step.formset:
+            formset = step.formset(request.POST)
+        else:
+            form = step.form(request.POST)
+
+        if form and not form.is_valid():
             return self._show_form(request, step, form)
 
-        self.set_cleaned_data(request, step, form.cleaned_data)
-        self.process_step(request, step, form)
+        if formset and not formset.is_valid():
+            return self._show_formset(request, step, formset)
+
+        if formset:
+            self.set_cleaned_data(request, step, formset.cleaned_data)
+            self.process_step(request, step, formset)
+        else:
+            self.set_cleaned_data(request, step, form.cleaned_data)
+            self.process_step(request, step, form)
+
         next_step = self.get_after(request, step)
 
         if next_step:
@@ -410,6 +453,26 @@ class SessionWizard(object):
         """
         pass
 
+
+    def process_show_formset(self, request, step, formset):
+        """
+        Hook used for providing extra context that can be used in the
+        template used to render the current formset.
+
+        :param request:
+            A ``HttpRequest`` object that carries along with it the session
+            used to access the wizard state.
+
+        :param step:
+            The current :class:`Step` that is being processed.
+
+        :param formset:
+            The Django ``BaseFormSet`` object that is being processed.
+        """
+        pass
+
+
+
     def process_step(self, request, step, form):
         """
         Hook for modifying the ``SessionWizard``'s internal state, given a fully
@@ -427,7 +490,7 @@ class SessionWizard(object):
             The current :class:`Step` that is being processed.
 
         :param form:
-            The Django ``Form`` object that is being processed.
+            The Django ``Form`` or ``BaseFormSet`` object that is being processed.
         """
         pass
 
@@ -444,7 +507,7 @@ class SessionWizard(object):
             The current :class:`Step` that is being processed.
 
         :param form:
-            The Django ``Form`` object that is being processed.
+            The Django ``Form`` or ``BaseFormset`` object that is being processed.
         """
         return 'forms/wizard.html'
 
@@ -470,6 +533,31 @@ class SessionWizard(object):
         """
         return render_to_response(self.get_template(request, step, form),
             context, RequestContext(request))
+
+    def render_formset(self, request, step, formset, context):
+        """
+        Renders a formset with the provided context and returns a ``HttpResponse``
+        object. This can be overridden to provide custom rendering to the
+        client or using a different template engine.
+
+        :param request:
+            A ``HttpRequest`` object that carries along with it the session
+            used to access the wizard state.
+
+        :param step:
+            The current :class:`Step` that is being processed.
+
+        :param formset:
+            The Django ``BaseFormSet`` object that is being processed.
+
+        :param context:
+            The default context that templates can use which also contains
+            any extra context created in the ``process_show_form`` hook.
+        """
+
+
+        return render_to_response(self.get_template(request, step, formset),
+                                  context, RequestContext(request))
 
     def done(self, request):
         """
