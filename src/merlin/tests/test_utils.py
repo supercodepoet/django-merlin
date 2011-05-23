@@ -1,5 +1,7 @@
 import unittest
 
+from django.forms.formsets import formset_factory
+
 from merlin.tests.fixtures.testproject.forms import *
 from merlin.wizards.utils import *
 
@@ -40,6 +42,19 @@ class UtilsTestCase(unittest.TestCase):
         self.assertEquals(unicode(step1), u'step1')
 
         self.assertEquals('Step: %s' % repr(step1), 'Step: step1')
+
+    def test_step_with_formset(self):
+        """
+        Just checks that a step can be created using a formset
+        """
+        UserDetailsFormSet = formset_factory(UserDetailsForm)
+        step = Step('step', UserDetailsFormSet)
+
+        self.assertEqual(step.form, None)
+        self.assertEqual(step.formset.__class__,
+                         UserDetailsFormSet.__class__)
+        self.assertEquals(str(step), 'step')
+        self.assertEquals(unicode(step), u'step')
 
     def test_wizard_expansion(self):
         state = WizardState()
