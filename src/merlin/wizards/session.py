@@ -168,7 +168,7 @@ class SessionWizard(object):
 
         if form_data:
             if step.formset:
-                formset = step.formset(form_data)
+                formset = step.formset(initial=form_data)
             else:
                 form = step.form(form_data)
         else:
