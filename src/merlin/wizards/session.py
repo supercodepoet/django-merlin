@@ -173,9 +173,17 @@ class SessionWizard(object):
                 form = step.form(form_data)
         else:
             if step.formset:
-                formset = step.formset()
+                initial_data = self.initial_formset_data(request,step,formset)
+                if initial_data:
+                    formset = step.formset(initial=initial_data)
+                else:
+                    formset = step.formset()
             else:
-                form = step.form()
+                initial_data = self.initial_form_data(request,step,form)
+                if initial_data:
+                    formset = step.form(initial=initial_data)
+                else:
+                    formset = step.form()
 
         if formset:
             return self._show_formset(request, step, formset)
@@ -435,6 +443,39 @@ class SessionWizard(object):
             A ``HttpRequest`` object for this request.
         """
         self.clear(request)
+
+
+    def initial_form_data(self, request, step, form):
+        """
+        Hook used for providing initial form data.
+
+        :param request:
+            A ``HttpRequest`` object that carries along with it the session
+            used to access the wizard state.
+
+        :param step:
+            The current :class:`Step` that is being processed.
+
+        :param form:
+            The Django ``Form`` object that is being processed.
+        """
+        return None
+
+    def initial_formset_data(self, request, step, formset):
+        """
+        Hook used for providing initial form data.
+
+        :param request:
+            A ``HttpRequest`` object that carries along with it the session
+            used to access the wizard state.
+
+        :param step:
+            The current :class:`Step` that is being processed.
+
+        :param formset:
+            The Django ``Formset`` object that is being processed.
+        """
+        return None
 
     def process_show_form(self, request, step, form):
         """
