@@ -181,9 +181,9 @@ class SessionWizard(object):
             else:
                 initial_data = self.initial_form_data(request,step,form)
                 if initial_data:
-                    formset = step.form(initial=initial_data)
+                    form = step.form(initial=initial_data)
                 else:
-                    formset = step.form()
+                    form = step.form()
 
         if formset:
             return self._show_formset(request, step, formset)
