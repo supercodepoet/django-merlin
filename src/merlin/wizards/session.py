@@ -203,7 +203,7 @@ class SessionWizard(object):
         if step.formset:
             formset = step.formset(request.POST)
         else:
-            form = step.form(request.POST)
+            form = step.form(data=request.POST)
 
         if form and not form.is_valid():
             return self._show_form(request, step, form)
