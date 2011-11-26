@@ -136,7 +136,7 @@ class SessionWizard(object):
         """
         Returns the base URL of the wizard.
         """
-        index = request.path.find(step.slug)
+        index = request.path.rfind(step.slug)
 
         return request.path[:index]
 
