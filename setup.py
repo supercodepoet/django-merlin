@@ -6,7 +6,7 @@ README = open(os.path.join(here, 'README.rst')).read()
 NEWS = open(os.path.join(here, 'NEWS.txt')).read()
 
 
-version = '0.5'
+version = '0.6'
 
 install_requires = [
     # List your project dependencies here.
@@ -28,9 +28,9 @@ setup(name='django-merlin',
       'Programming Language :: Python :: 2.7'
     ],
     keywords='forms wizard django session',
-    author='Localbase, Inc.',
-    author_email='development@localbase.com',
-    url='http://github.com/localbase/django-merlin',
+    author='supercodepoet',
+    author_email='travis@travischase.me',
+    url='http://github.com/supercodepoet/django-merlin',
     license='BSD',
     packages=find_packages('src'),
     package_dir = {'': 'src'},
