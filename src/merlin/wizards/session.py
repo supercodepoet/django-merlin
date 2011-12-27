@@ -128,9 +128,7 @@ class SessionWizard(object):
         """
         Returns the base URL of the wizard.
         """
-        index = request.path.find(step.slug)
-
-        return request.path[:index]
+        return request.path[:request.path.rindex(step.slug)]
 
     def process_GET(self, request, step):
         """
