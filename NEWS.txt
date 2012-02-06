@@ -6,6 +6,13 @@
 News
 ====
 
+0.8
+---
+
+*Release date: 06-Feb-2012*
+
+* Adding a pip requirements file for those using virtualenv
+
 0.7
 ---
 
