@@ -6,6 +6,16 @@
 News
 ====
 
+0.7
+---
+
+*Release date: 06-Feb-2012*
+
+* Updated the dependancies for the project so the buildout build would
+  work again
+* Stopped squashing missing slug and step errors with a 404 and now
+  raising custom exceptions
+
 0.6
 ---
 

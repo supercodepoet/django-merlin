@@ -6,7 +6,7 @@ README = open(os.path.join(here, 'README.rst')).read()
 NEWS = open(os.path.join(here, 'NEWS.txt')).read()
 
 
-version = '0.6'
+version = '0.7'
 
 install_requires = [
     # List your project dependencies here.
@@ -20,7 +20,7 @@ setup(name='django-merlin',
     description="Providing alternate form wizards for the Django project.",
     long_description=README + '\n\n' + NEWS,
     classifiers=[
-      'Development Status :: 3 - Alpha',
+      'Development Status :: 4 - Beta',
       'Framework :: Django',
       'Intended Audience :: Developers',
       'License :: OSI Approved :: BSD License',

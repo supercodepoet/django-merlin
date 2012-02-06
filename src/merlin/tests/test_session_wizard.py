@@ -3,6 +3,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase
 
 from merlin.tests.fixtures.testproject import forms
+from merlin.wizards import MissingStepException, MissingSlugException
 from merlin.wizards.session import SessionWizard
 from merlin.wizards.utils import Step
 
@@ -36,8 +37,8 @@ class SessionWizardTest(TestCase):
             self.fail("We should only fail with a TypeError, exception was %s" % e)
 
     def test_session_wizard_no_slug(self):
-        response = self.client.get('/simpletest')
-        self.assertEquals(response.status_code, 404)
+        with self.assertRaises(MissingSlugException):
+            self.client.get('/simpletest')
 
     def test_form_not_valid(self):
         response = self.client.get('/simpletest/user-details')

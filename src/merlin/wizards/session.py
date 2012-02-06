@@ -1,9 +1,9 @@
 from functools import wraps
-from urlparse import urljoin
 
 from django.http import *
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
+from merlin.wizards import MissingStepException, MissingSlugException
 
 from merlin.wizards.utils import *
 
@@ -64,7 +64,7 @@ class SessionWizard(object):
         slug = kwargs.get('slug', None)
 
         if not slug:
-            raise Http404()
+            raise MissingSlugException("Slug not found.")
 
         step = self.get_step(request, slug)
 
@@ -75,16 +75,13 @@ class SessionWizard(object):
 
                 return HttpResponseRedirect(redirect)
 
-            raise Http404()
+            raise MissingStepException("Step for slug %s not found." % slug)
 
-        try:
-            method_name = 'process_%s' % request.method
-            method = getattr(self, method_name)
+        method_name = 'process_%s' % request.method
+        method = getattr(self, method_name)
 
-            return method(request, step)
+        return method(request, step)
 
-        except AttributeError:
-            raise Http404()
 
     def _init_wizard(self, request):
         """
