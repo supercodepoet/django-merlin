@@ -1,10 +1,12 @@
 from functools import wraps
 
 from django.http import *
+from django.utils.decorators import method_decorator
 from django.shortcuts import render_to_response
 from django.template.context import RequestContext
-from merlin.wizards import MissingStepException, MissingSlugException
+from django.contrib.auth.decorators import login_required
 
+from merlin.wizards import MissingStepException, MissingSlugException
 from merlin.wizards.utils import *
 
 
@@ -482,3 +484,14 @@ class SessionWizard(object):
         raise NotImplementedError("Your %s class has not defined a done() " \
                                   "method, which is required." \
                                   % self.__class__.__name__)
+                                  
+
+class ProtectedSessionWizard(SessionWizard):
+    """
+    A protected SessionWizard, which simply uses the default django mechanisms 
+    for `login_required`.
+    """
+    @method_decorator(login_required)
+    def __call__(self, request, *args, **kwargs):
+        super(ProtectedSessionWizard, self).__call__(request, *args, **kwargs)
+
