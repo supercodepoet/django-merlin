@@ -493,5 +493,5 @@ class ProtectedSessionWizard(SessionWizard):
     """
     @method_decorator(login_required)
     def __call__(self, request, *args, **kwargs):
-        super(ProtectedSessionWizard, self).__call__(request, *args, **kwargs)
+        return super(ProtectedSessionWizard, self).__call__(request, *args, **kwargs)
 
