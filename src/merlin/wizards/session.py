@@ -327,7 +327,7 @@ class SessionWizard(object):
         :param data:
             The dictionary of ``Form`` data to store.
         """
-        self._get_state(request)._initial_data[step] = data
+        self._get_state(request).initial_data[step] = data
 
     def get_initial_data(self, request, step):
         """
@@ -340,7 +340,7 @@ class SessionWizard(object):
         :param step:
             The :class:`Step` to use to pull the cleaned form data.
         """
-        return self._get_state(request)._initial_data.get(step, {})
+        return self._get_state(request).initial_data.get(step, {})
 
     def get_cleaned_data(self, request, step):
         """
