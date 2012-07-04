@@ -139,15 +139,18 @@ class SessionWizard(object):
 
     def process_GET(self, request, step):
         """
-        Renders the ``Form`` for the requested :class:`Step`
+        Renders the ``Form`` for the requested :class:`Step`,
+        providing initial data from the ``WizardState`` for the 
+        current step.
         """
+        initial_data = self.get_initial_data(request, step)
         form_data = self.get_cleaned_data(request, step)
 
         if form_data:
-            form = step.form(form_data)
+            form = step.form(form_data, initial_data=initial_data)
 
         else:
-            form = step.form()
+            form = step.form(initial_data=initial_data)
 
         return self._show_form(request, step, form)
 
@@ -308,6 +311,36 @@ class SessionWizard(object):
         if step not in steps:
             index = steps.index(current_step) + 1
             steps.insert(index, step)
+
+    @modifies_session
+    def set_initial_data(self, request, step, data):
+        """
+        Returns a dictionary suitable for sending onto a form as initial data
+        
+        :param request:
+            A ``HttpRequest`` object that carries along with it the session
+            used to access the wizard state.
+
+        :param step:
+            The :class:`Step` to use to pull the cleaned form data.
+
+        :param data:
+            The dictionary of ``Form`` data to store.
+        """
+        self._get_state(request)._initial_data[step] = data
+
+    def get_initial_data(self, request, step):
+        """
+        Returns a dictionary suitable for sending onto a form as initial data
+        
+        :param request:
+            A ``HttpRequest`` object that carries along with it the session
+            used to access the wizard state.
+
+        :param step:
+            The :class:`Step` to use to pull the cleaned form data.
+        """
+        return self._get_state(request)._initial_data.get(step, {})
 
     def get_cleaned_data(self, request, step):
         """
