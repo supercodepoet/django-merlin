@@ -70,10 +70,7 @@ class SessionWizard(object):
 
         if not step:
             if slug == 'cancel':
-                self.cancel(request)
-                redirect = request.REQUEST.get('rd', '/')
-
-                return HttpResponseRedirect(redirect)
+                return self.cancel(request)
 
             raise MissingStepException("Step for slug %s not found." % slug)
 
@@ -383,12 +380,16 @@ class SessionWizard(object):
         """
         Hook used to cancel a wizard. This will be called when slug is passed
         that matches "cancel". By default the method will clear the session
-        data.
+        data, then redirect to the url specified in the `rd` GET parameter.
+        
+        Override this method to cause the redirection to head somewhere else.
 
         :param request:
             A ``HttpRequest`` object for this request.
         """
         self.clear(request)
+        redirect = request.REQUEST.get('rd', '/')
+        return HttpResponseRedirect(redirect)
 
     def process_show_form(self, request, step, form):
         """
