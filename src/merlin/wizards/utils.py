@@ -95,4 +95,4 @@ class WizardState(UserDict):
         self.steps = kwargs.get('steps', None)
         self.current_step = kwargs.get('current_step', None)
         self.form_data = kwargs.get('form_data', None)
-        self.initial_data = kwargs.get('initial_data', None)
+        self.initial_data = kwargs.get('initial_data', {})
