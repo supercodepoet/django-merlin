@@ -83,6 +83,11 @@ class WizardState(UserDict):
         A ``dict`` of the cleaned form data collected to this point and
         referenced using the :ref:`Step <api_step>`'s slug as the key to
         the ``dict``
+
+    :param initial_data:
+        A ``dict`` of data to seed into forms as initial data.
+        Referenced using the :ref:`Step <api_step>`'s slug as the key to
+        the ``dict``        
     """
     def __init__(self, *args, **kwargs):
         UserDict.__init__(self, *args, **kwargs)
@@ -90,3 +95,4 @@ class WizardState(UserDict):
         self.steps = kwargs.get('steps', None)
         self.current_step = kwargs.get('current_step', None)
         self.form_data = kwargs.get('form_data', None)
+        self.initial_data = kwargs.get('initial_data', None)
