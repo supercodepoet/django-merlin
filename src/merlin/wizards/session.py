@@ -1,3 +1,5 @@
+from urlparse import urljoin
+
 from functools import wraps
 
 from django.http import *
@@ -164,7 +166,13 @@ class SessionWizard(object):
 
         self.set_cleaned_data(request, step, form.cleaned_data)
         self.process_step(request, step, form)
-        next_step = self.get_after(request, step)
+
+        slug = request.POST.get('slug', None)
+
+        if slug:
+            next_step = self.get_step(request, slug)
+        else:
+            next_step = self.get_after(request, step)
 
         if next_step:
             url_base = self._get_URL_base(request, step)
