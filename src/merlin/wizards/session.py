@@ -1,3 +1,5 @@
+from urlparse import urljoin
+
 from functools import wraps
 
 from django.http import *
