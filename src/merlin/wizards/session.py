@@ -63,6 +63,11 @@ class SessionWizard(object):
 
         slug = kwargs.get('slug', None)
 
+        """Check if the user is authenticated"""
+        if not request.user.is_authenticated():
+            request.session['is_authenticated'] = False
+            return self.user_not_auth_redirect(request)
+
         if not slug:
             raise MissingSlugException("Slug not found.")
 
@@ -481,4 +486,17 @@ class SessionWizard(object):
         """
         raise NotImplementedError("Your %s class has not defined a done() " \
                                   "method, which is required." \
+                                  % self.__class__.__name__)
+
+    def user_not_auth_redirect(self, request):
+        """
+        Responsible for redirect to another url when the user is not authenticated.
+         This function needs to return a ``HttpResponse`` object.
+
+        :param request:
+            A ``HttpRequest`` object that carries along with it the session
+            used to access the wizard state.
+        """
+        raise NotImplementedError("Your %s class has not defined a redirect " \
+                                  "when the user is not logged." \
                                   % self.__class__.__name__)
