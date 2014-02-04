@@ -9,11 +9,13 @@ __all__ = ('Step', 'WizardState',)
 class Step(object):
     """
     When constucting a form wizard, the wizard needs to be composed of a
-    sequental series of steps in which it is to display forms to the user and
-    collect the data from those forms. To be able to provide these forms to the
-    :ref:`SessionWizard <api_sessionwizard>`, you must first wrap the Django
-    :class:`django.forms.Form` in a ``Step`` object. The ``Step`` object gives
-    the ability to store the :class:`django.forms.Form` class to be used, as
+    sequental series of steps in which it is to display forms or formsets to the
+    user and collect the data from those forms or formsets.
+    To be able to provide these forms to the :ref:`SessionWizard
+    <api_sessionwizard>`, you must first wrap the Django :class:`django.forms
+    .formsets.BaseFormSet` or :class:`django.forms.Form` in a ``Step`` object
+    . The ``Step`` object gives the ability to store the :class:`django.forms
+    .Form` or :class:`django.forms.formsets.BaseFormSet` class to be used, as
     well as, a unique slug to be used in the wizard navigation.
 
     .. versionadded:: 0.1
@@ -26,18 +28,26 @@ class Step(object):
 
     :param form:
         This *MUST* be a subclass of :class:`django.forms.Form` or
-        :class:`django.forms.ModelForm`. This should not be an instance of that
-        subclass. The :ref:`SessionWizard <api_sessionwizard>` will use this
-        class to create instances for the user. If going back in the wizard
-        process, the :ref:`SessionWizard <api_sessionwizard>` will prepopulate
-        the form with any cleaned data already collected.
+        :class:`django.forms.ModelForm` or :class:`django.forms.BaseFormSet`.
+        This should not be an instance of that subclass. The
+        :ref:`SessionWizard <api_sessionwizard>` will use
+        this class to create instances for the user. If going back in the
+        wizard process, the :ref:`SessionWizard <api_sessionwizard>` will
+        prepopulate the form or formset with any cleaned data already
+        collected.
     """
     def __init__(self, slug, form):
-        if not issubclass(form, (forms.Form, forms.ModelForm,)):
-            raise ValueError('Form must be subclass of a Django Form')
-
         self.slug = str(slug)
-        self.form = form
+
+        if issubclass(form, (forms.Form, forms.ModelForm,)):
+            self.form = form
+            self.formset = None
+        elif issubclass(form, (forms.formsets.BaseFormSet,)):
+            self.formset = form
+            self.form = None
+        else:
+            raise ValueError('Form must be subclass of a Django Form or '
+                             'Formset')
 
     def __hash__(self):
         return hash(self.slug)

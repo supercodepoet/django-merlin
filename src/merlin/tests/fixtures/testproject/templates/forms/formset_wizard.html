@@ -1,0 +1,18 @@
+{% extends "forms/base.html" %}
+
+{% block content %}
+<form action="." method="post">{% csrf_token %}
+    <table>
+    {{ formset }}
+    </table>
+{% if previous_step %}
+    <a class="back" href="{{ url_base }}{{ previous_step.slug }}">Back</a>
+{% endif %}
+{% if next_step %}
+    <a class="next" href="{{ url_base }}{{ next_step.slug }}">Next</a>
+{% else %}
+    <input type="submit">
+{% endif %}
+    <input type="hidden" name="current_step" value="{{ current_step.slug }}" />
+</form>
+{% endblock %}

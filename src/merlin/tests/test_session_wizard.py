@@ -36,9 +36,28 @@ class SessionWizardTest(TestCase):
         except Exception as e:
             self.fail("We should only fail with a TypeError, exception was %s" % e)
 
+    def test_raises_on_duplicate_steps(self):
+        try:
+            SessionWizard([
+                Step('user-details', forms.UserDetailsForm),
+                Step('user-details', forms.ContactDetailsForm)]
+            )
+            self.fail("We shouldn't be allowed to create a SessionWizard "
+                      "with duplicate step names")
+        except ValueError as ve:
+            self.assertEquals(ve.message, 'Step slugs must be unique.')
+
     def test_session_wizard_no_slug(self):
         with self.assertRaises(MissingSlugException):
             self.client.get('/simpletest')
+
+    def test_session_wizard_wrong_slug(self):
+        response = self.client.get('/simpletest/qwerty')
+        self.assertEquals(response.status_code, 404)
+
+    def test_method_not_valid(self):
+        response = self.client.head('/simpletest/user-details')
+        self.assertEquals(response.status_code, 404)
 
     def test_form_not_valid(self):
         response = self.client.get('/simpletest/user-details')
@@ -154,6 +173,35 @@ class SessionWizardTest(TestCase):
         self.assertEquals(response.status_code, 200)
 
 
+class FormsetWizardTest(TestCase):
+
+    def test_mock_wizard(self):
+        response = self.client.get('/formsettest/user-details')
+        self.assertEquals(response.status_code, 200)
+
+        soup = BeautifulSoup(response.content)
+
+        self.assertTrue(soup.find('input', id='id_form-TOTAL_FORMS'))
+        self.assertTrue(soup.find('input', id='id_form-INITIAL_FORMS'))
+        self.assertTrue(soup.find('input', id='id_form-MAX_NUM_FORMS'))
+
+        self.assertTrue(soup.find('input', id='id_form-0-first_name'))
+        self.assertTrue(soup.find('input', id='id_form-0-last_name'))
+        self.assertTrue(soup.find('input', id='id_form-0-email'))
+
+        post = self.client.post('/formsettest/user-details', {
+            'form-TOTAL_FORMS': '1',
+            'form-INITIAL_FORMS': '0',
+            'form-MAX_NUM_FORMS': '3',
+            'form-0-first_name': 'Yorgos',
+            'form-0-last_name': 'Pagles',
+            'form-0-email': 'yorgos@pagles.org'
+        }, follow=True)
+
+        self.assertEquals(post.status_code, 200)
+        self.assertEquals(post.content, 'All done')
+
+        
 class MockWizardTest(TestCase):
 
     def test_mock_wizard(self):

@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import *
-
-from merlin.tests.fixtures.testproject.wizard import MockWizard
+from merlin.tests.fixtures.testproject.wizard import (MockWizard,
+                                                      FormSetWizard)
 from merlin.wizards.utils import Step
 from merlin.wizards.session import SessionWizard
 
@@ -17,6 +17,8 @@ urlpatterns = patterns('',
     url(r'^bettertest/(?P<slug>[A-Za-z0-9_-]+)$', MockWizard([
         Step('user-details', forms.UserDetailsForm),
         Step('contact-details', forms.ContactDetailsForm)])),
+    url(r'^formsettest/(?P<slug>[A-Za-z0-9_-]+)$', FormSetWizard([
+        Step('user-details', forms.UserDetailsFormSet),])),
     url(r'^$', views.index, name='test-index'),
     url(r'^more$', views.more, name='test-more'),
 )
